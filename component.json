@@ -13,6 +13,9 @@
   "license": "MIT",
   "main": "index.js",
   "scripts": [
-    "index.js"
+    "index.js",
+    "context.js",
+    "v4.js",
+    "bindings/type.js"
   ]
 }
