@@ -1,0 +1,18 @@
+{
+  "name": "json-v",
+  "repo": "ericgj/json-v",
+  "description": "Modular JSON Schema validator",
+  "version": "0.0.1",
+  "keywords": [],
+  "dependencies": {
+    "component/type": "*"  
+  },
+  "development": {
+    "timoxley/assert": "*"  
+  },
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": [
+    "index.js"
+  ]
+}
