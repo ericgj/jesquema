@@ -1,3 +1,5 @@
+'use strict';
+
 var truefn = function(){ return true; }
 
 module.exports = Context;
