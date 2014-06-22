@@ -50,4 +50,47 @@ describe('basic test', function(){
     })
   })
 
+  it('should validate anyOf', function(){
+    var schema = { anyOf: [ { required: ["a"] }, { required: ["b"] }, { required: ["c"] } ] }
+      , valid = { c: 1, b: 2 }
+      , invalid = { d: 3 }
+
+    var v = validate('4').schema(schema)
+    v(valid, function(err,ctx){
+      console.log('anyOf valid assertions: %o', ctx.assertions());
+      assert(err == null);
+    })
+    
+    v(invalid, function(err,ctx){
+      console.log('anyOf invalid assertions: %o', ctx.assertions());
+      assert(err);
+      assert(err.message, 'not any conditions valid');
+    })
+  })
+
+  it('should validate oneOf', function(){
+    var schema = { oneOf: [ { required: ["a","b"] }, { required: ["b","c"] }, { required: ["c","a"] } ] }
+      , valid = { c: 1, b: 2 }
+      , invalidTooFew = { d: 3, a: 4 }
+      , invalidTooMany = { a: 1, b: 2, c: 3 }
+
+    var v = validate('4').schema(schema)
+    v(valid, function(err,ctx){
+      console.log('oneOf valid assertions: %o', ctx.assertions());
+      assert(err == null);
+    })
+    
+    v(invalidTooFew, function(err,ctx){
+      console.log('oneOf invalid (too few) assertions: %o', ctx.assertions());
+      assert(err);
+      assert(err.message, 'no conditions valid');
+    })
+
+    v(invalidTooMany, function(err,ctx){
+      console.log('oneOf invalid (too many) assertions: %o', ctx.assertions());
+      assert(err);
+      assert(err.message, 'more than one condition valid');
+    })
+  })
+
 })

@@ -26,20 +26,23 @@ Context.prototype.all = function(){
     return this.assertionsValid() && 
            this.contexts.every( function(c){ return c.valid(); } );
   }
+  return this;
 }
 
 Context.prototype.any = function(){ 
   this.valid = function(){
     return this.assertionsValid() &&
-           this.contexts.any( function(c){ return c.valid(); } );
+           this.contexts.some( function(c){ return c.valid(); } );
   }
+  return this;
 }
 
 Context.prototype.none = function(){
   this.valid = function(){
     return this.assertionsValid() &&
-           !this.contexts.any( function(c){ return c.valid(); } );
+           !this.contexts.some( function(c){ return c.valid(); } );
   }
+  return this;
 }
 
 Context.prototype.one = function(){
@@ -55,6 +58,7 @@ Context.prototype.one = function(){
       return (count == 1);
     }
   }
+  return this;
 }
 
 Context.prototype.subcontext = function(ipath,spath){
@@ -207,7 +211,7 @@ function Assertion(value){
     ret.push( messageShort() );
     if (!value && expected !== undefined){ 
       ret.push( "expected " + JSON.stringify(expected) + 
-                ", was " + JSON.stringify(actual || instance)
+                ", was " + JSON.stringify(actual)
               );
     }
     return ret.join(' :: ');    

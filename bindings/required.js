@@ -7,8 +7,8 @@ module.exports = function(instance, schema, ctx){
   if (!('array' == type(reqs))) return;
 
   for (var i=0;i<reqs.length;++i){
-    this.assert( !(undefined == instance[reqs[i]]), 
-                "missing required property"
-               ).expected(reqs[i])
+    ctx.assert(!(undefined == instance[reqs[i]]), 
+               "missing required property"
+              ).expected(reqs[i])
   }
 }

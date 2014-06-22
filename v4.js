@@ -6,6 +6,9 @@ module.exports = function(url, bindings, formats){
   var fmts = formats[url] = {};
 
   schema.type                 = require('./bindings/type');
+  schema.allOf                = require('./bindings/all_of');
+  schema.anyOf                = require('./bindings/any_of');
+  schema.oneOf                = require('./bindings/one_of');
   schema.minProperties        = require('./bindings/min_properties');
   schema.maxProperties        = require('./bindings/max_properties');
   schema.required             = require('./bindings/required');
