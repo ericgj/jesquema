@@ -16,6 +16,9 @@
     "index.js",
     "context.js",
     "v4.js",
-    "bindings/type.js"
+    "bindings/type.js",
+    "bindings/properties.js",
+    "bindings/pattern_properties.js",
+    "bindings/additional_properties.js"
   ]
 }

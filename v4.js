@@ -7,5 +7,7 @@ module.exports = function(url, bindings, formats){
 
   schema.type = require('./bindings/type');
   schema.properties = require('./bindings/properties');
-  
+  schema.patternProperties = require('./bindings/pattern_properties');
+  schema.additionalProperties = require('./bindings/additional_properties');
+
 }

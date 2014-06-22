@@ -1,5 +1,6 @@
 'use strict';
 
+var has = hasOwnProperty;
 var truefn = function(){ return true; }
 
 module.exports = Context;
@@ -17,7 +18,7 @@ function Context(instance,schema,ipath,spath){
 }
 
 Context.prototype.assertionsValid = function(){
-  return this._assertions.every( function(a){ return !!a().value; } );
+  return this._assertions.every( function(a){ return !!a.value; } );
 }
 
 Context.prototype.all = function(){
@@ -57,8 +58,8 @@ Context.prototype.one = function(){
 }
 
 Context.prototype.subcontext = function(ipath,spath){
-  var ctx =  Context(instance, 
-                     schema, 
+  var ctx =  Context(this.instance, 
+                     this.schema, 
                      joinPath(this.instancePath,ipath),
                      joinPath(this.schemaPath,spath)
                     );
@@ -95,14 +96,14 @@ Context.prototype.assertions = function(){
 
 Context.prototype.errors = function(){
   return this.assertionsWhere( 
-    function(assert) { return !assert().value;  },
-    function(context){ return !context.valid(); }
+    function(a){ return !a.value; },
+    function(c){ return !c.valid();   }
   );
 }
 
 Context.prototype.assertionsWhere = function(assertFilter, contextFilter, accum){
   assertFilter = assertFilter || truefn;
-  contextFilter = assertFilter || truefn;
+  contextFilter = contextFilter || truefn;
   accum = accum || [];
   var instance = this.instance
     , schema   = this.schema
@@ -125,37 +126,52 @@ Context.prototype.assertionsWhere = function(assertFilter, contextFilter, accum)
 
 function Assertion(value){
 
-  var obj = {value: value};
+  var predicate,
+      schemaPath,
+      instancePath,
+      property,
+      expected,
+      actual,
+      code
 
   builder.predicate = function(_){
-    obj.predicate = _; return this;
+    predicate = _; return this;
   }
 
   builder.schemaPath = function(_){
-    obj.schemaPath = _; return this;
+    schemaPath = _; return this;
   }
 
   builder.instancePath = function(_){
-    obj.instancePath = _; return this;
+    instancePath = _; return this;
   }
 
   builder.property = function(_){
-    obj.property = _; return this;
+    property = _; return this;
   }
 
   builder.expected = function(_){
-    obj.expected = _; return this;
+    expected = _; return this;
   }
 
   builder.actual = function(_){
-    obj.actual = _; return this;
+    actual = _; return this;
   }
 
   builder.code = function(_){
-    obj.code = _; return this;
+    code = _; return this;
   }
 
   function builder(instance,schema){
+    var obj = {};
+    obj.value    = value;
+    obj.predicate = predicate;
+    obj.schemaPath = schemaPath;
+    obj.instancePath = instancePath;
+    obj.property = property;
+    obj.expected = expected;
+    obj.actual = actual;
+    obj.code = code;
     obj.instance = getPath(instance, obj.instancePath);
     obj.schema   = getPath(schema, obj.schemaPath);
     obj.message  = messageShort();
@@ -167,36 +183,33 @@ function Assertion(value){
 
   function messageShort(){
     var ret = [];
-    if (obj.instancePath !== undefined && obj.instancePath.length > 0){
-      ret.push(obj.instancePath);
+    if (instancePath !== undefined && instancePath.length > 0){
+      ret.push(instancePath);
     }
-    if (obj.property !== undefined && obj.property.length > 0){
-      ret.push(obj.property);
+    if (property !== undefined && property.length > 0){
+      ret.push(property);
     }
-    ret.push( obj.value ? "valid" : "invalid" )
-    if ( !obj.value && obj.predicate !== undefined){
-      ret.push("::");
-      ret.push(obj.predicate);
+
+    ret.push( value ? "valid" : (predicate || "invalid") );
+
+    if (!value && code){
+      ret.push("[" + code + "]");
     }
-    if (!obj.value && obj.code){
-      ret.push("::");
-      ret.push("[" + obj.code + "]");
-    }
-    return ret.join(' ');
+    return ret.join(' :: ');
   }
 
   function messageLong(){
     var ret = [];
     ret.push( messageShort() );
-    if (!obj.value && obj.expected !== undefined){ 
-      ret.push("::");
-      ret.push( "expected " + JSON.stringify(obj.expected) + 
-                ", was " + JSON.stringify(obj.actual || obj.instance)
+    if (!value && expected !== undefined){ 
+      ret.push( "expected " + JSON.stringify(expected) + 
+                ", was " + JSON.stringify(actual || instance)
               );
     }
-    return ret.join(' ');    
+    return ret.join(' :: ');    
   }
 
+  builder.value = value;
   return builder;
 }
 
@@ -204,7 +217,7 @@ function Assertion(value){
 // utils
 
 function joinPath(){
-  return [].slice(arguments,0).map( function(a){
+  return [].slice.call(arguments,0).map( function(a){
     return (a == undefined ? '' : a);
   }).join('/');
 }
@@ -212,14 +225,16 @@ function joinPath(){
 
 function getPath(instance,path){
   if (path === undefined) return instance;
+  if (!(typeof instance == 'object')) return instance;  // not object or array
   path = path.toString();
   if (0==path.length) return instance;
   var parts = path.split('/')
     , prop = parts.shift()
     , rest = parts.join('/')
   if ('#'==prop) return getPath(instance,rest);
+  if (''==prop) return getPath(instance,rest);
   if (!has.call(instance,prop)) return;
-  var branch = instance[prop]
+  var branch = instance[prop];
   return getPath(branch,rest);
 }
 

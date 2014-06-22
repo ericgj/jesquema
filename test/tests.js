@@ -14,16 +14,40 @@ describe('basic test', function(){
 
     var v = validate('4').schema(schema)
     v(valid, function(err,ctx){
-      console.log('valid context: %o', ctx.assertions());
+      console.log('object type valid assertions: %o', ctx.assertions());
       assert(err == null);
     })
 
     v(invalid, function(err,ctx){
-      console.log('invalid context: %o', ctx.assertions());
-      assert(!!err);
-      assert.equal( err.message, 'invalid :: does not match type' );
+      console.log('object type invalid assertions: %o', ctx.assertions());
+      assert(err);
+      assert.equal( err.message, 'type not valid' );
     })
 
+  })
+
+  it('should validate properties', function(){
+    var schema = { properties: { foo: { type: 'object' } } }
+      , valid = { foo: {} }
+      , invalid = { foo: 0 }
+      , empty = {}
+
+    var v = validate('4').schema(schema)
+    v(valid, function(err,ctx){
+      console.log('properties valid assertions: %o', ctx.assertions());
+      assert(err == null);
+    })
+
+    v(invalid, function(err,ctx){
+      console.log('properties invalid assertions: %o', ctx.assertions());
+      assert(err);
+      assert.equal( err.message, '/foo :: type not valid' );
+    })
+
+    v(empty, function(err,ctx){
+      console.log('properties empty assertions: %o', ctx.assertions());
+      assert(err == null);
+    })
   })
 
 })

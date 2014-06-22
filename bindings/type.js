@@ -17,7 +17,7 @@ module.exports = function(instance, schema, ctx){
                 (isinteger && indexOf.call(types,'integer')>=0)
     , isnull = (actual == 'null')
   ctx.assert( valid, 
-              isnull ? "is missing" : "does not match type"
+              isnull ? "is missing" : "type not valid"
             ).actual( actual )
              .expected( types );
 }
