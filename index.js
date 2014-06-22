@@ -130,21 +130,3 @@ function extend(obj) {
 };
 
 
-//////// stupid example of validation function
-
-function properties(instance, schema, ctx){
-  for (var k in schema.properties){
-    var spath = 'properties/' + k
-      , ipath = k
-      , subschema = this.subschema(spath)
-      , subinst = this.subinstance(ipath)
-    ctx.assert( 
-      this.validate(subinst, subschema, ctx.subcontext(ipath,spath)),
-      'has invalid property "' + k + '"'
-    ).property(k).code(123)
-  }
-}
-
-
-////////
-
