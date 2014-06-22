@@ -33,7 +33,7 @@ module.exports = function(instance, schema, ctx){
     if ('object' == addtype){
       this.validate( instance[addprops[i]], 
                      schaddprops, 
-                     ctx.subcontext(addprops[i],'additionalProperties') 
+                     ctx.subcontext([addprops[i]],[additionalProperties]) 
                    );
     }
   }

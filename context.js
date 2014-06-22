@@ -9,8 +9,8 @@ function Context(instance,schema,ipath,spath){
   if (!(this instanceof Context)) return new Context(instance,schema,ipath,spath);
   this.instance = instance;
   this.schema = schema;
-  this.instancePath = (ipath == undefined ? '' : ipath);
-  this.schemaPath = (spath == undefined ? '' : spath);
+  this.instancePath = (ipath == undefined ? [] : ipath);
+  this.schemaPath = (spath == undefined ? [] : spath);
   this._assertions = [];
   this.contexts = [];
   this.all();
@@ -58,10 +58,14 @@ Context.prototype.one = function(){
 }
 
 Context.prototype.subcontext = function(ipath,spath){
+  var ipathsub = this.instancePath.slice(0)
+    , spathsub = this.schemaPath.slice(0)
+  ipathsub.push.apply(ipathsub, ipath);
+  spathsub.push.apply(spathsub, spath);
   var ctx =  Context(this.instance, 
                      this.schema, 
-                     joinPath(this.instancePath,ipath),
-                     joinPath(this.schemaPath,spath)
+                     ipathsub,
+                     spathsub
                     );
   this.contexts.push(ctx);
   return ctx;
@@ -184,7 +188,7 @@ function Assertion(value){
   function messageShort(){
     var ret = [];
     if (instancePath !== undefined && instancePath.length > 0){
-      ret.push(instancePath);
+      ret.push(instancePath.join('/'));
     }
     if (property !== undefined && property.length > 0){
       ret.push(property);
@@ -224,16 +228,11 @@ function joinPath(){
 
 
 function getPath(instance,path){
-  if (path === undefined) return instance;
   if (!(typeof instance == 'object')) return instance;  // not object or array
-  path = path.toString();
   if (0==path.length) return instance;
-  var parts = path.split('/')
-    , prop = parts.shift()
-    , rest = parts.join('/')
-  if ('#'==prop) return getPath(instance,rest);
-  if (''==prop) return getPath(instance,rest);
-  if (!has.call(instance,prop)) return;
+  var prop = path[0]
+    , rest = path.slice(1)
+  if (undefined == instance[prop]) return;
   var branch = instance[prop];
   return getPath(branch,rest);
 }

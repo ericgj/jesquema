@@ -12,7 +12,7 @@ module.exports = function(instance, schema, ctx){
       var subinst = instance[prop];
       var matcher = new RegExp(rx);
       if (matcher.test(prop)){
-        var subctx = ctx.subcontext(prop, 'patternProperties/' + rx);
+        var subctx = ctx.subcontext([prop], ['patternProperties',rx]);
         this.validate(subinst, subsch, subctx)
       }
     }

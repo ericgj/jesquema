@@ -60,6 +60,16 @@ module.exports = function(version){
     return ctx.valid();
   }
 
+  // sugar
+  validate.results = function(instance){
+    var ret
+    validate(instance, function(err, ctx){
+      ret = ctx;
+    });
+    return ret;
+  }
+    
+
   // private
 
   function validator(){

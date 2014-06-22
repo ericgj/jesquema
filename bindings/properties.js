@@ -9,7 +9,7 @@ module.exports = function(instance, schema, ctx){
     if (undefined == instance[prop]) continue;
     var subsch = schema.properties[prop]
       , subinst = instance[prop]
-      , subctx = ctx.subcontext(prop, 'properties/' + prop)
+      , subctx = ctx.subcontext([prop], ['properties',prop])
 
     this.validate(subinst, subsch, subctx)
   }

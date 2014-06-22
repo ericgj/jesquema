@@ -41,7 +41,7 @@ describe('basic test', function(){
     v(invalid, function(err,ctx){
       console.log('properties invalid assertions: %o', ctx.assertions());
       assert(err);
-      assert.equal( err.message, '/foo :: type not valid' );
+      assert.equal( err.message, 'foo :: type not valid' );
     })
 
     v(empty, function(err,ctx){
