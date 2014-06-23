@@ -5,10 +5,15 @@ module.exports = function(instance, schema, ctx){
   if (!('array' == type(instance))) return;
   var items = schema.items
     , additional = schema.additionalItems
-    , itemstype = type(items)
-    , additionaltype = type(additional)
+
+  // per sec. 8.2.2 of spec
+  if (undefined == items) items = {};
+  if (undefined == additional) additional = {};
 
   if (!('object' == itemstype) && !('array' == itemstype)) return;
+
+  var itemstype = type(items)
+    , additionaltype = type(additional)
 
   if ('array' == itemstype){
     var subsch, subctx

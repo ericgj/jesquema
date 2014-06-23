@@ -8,6 +8,11 @@ module.exports = function(instance, schema, ctx){
     , schpatprops = schema.patternProperties
     , schaddprops = schema.additionalProperties
 
+  // per sec. 8.3.2
+  if (undefined == schprops) schprops = {};
+  if (undefined == schpatprops) schpatprops = {};
+  if (undefined == schaddprops) schaddprops = {};
+
   if (!('object' == type(schprops)) &&
       !('object' == type(schpatprops))) return;
 
