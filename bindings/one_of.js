@@ -6,7 +6,7 @@ module.exports = function(instance, schema, ctx){
 
   if (!('array' == type(oneOf))) return;
 
-  var subctx = ctx.subcontext([],['oneOf']).one()
+  var subctx = ctx.subcontext([],['oneOf']).validOne()
     , self = this
     , count = 0
 

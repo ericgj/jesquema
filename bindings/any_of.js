@@ -6,7 +6,7 @@ module.exports = function(instance, schema, ctx){
 
   if (!('array' == type(anyOf))) return;
 
-  var subctx = ctx.subcontext([],['anyOf']).any()
+  var subctx = ctx.subcontext([],['anyOf']).validAny()
     , self = this
 
   subctx.assert(

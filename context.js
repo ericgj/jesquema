@@ -13,7 +13,7 @@ function Context(instance,schema,ipath,spath){
   this.schemaPath = (spath == undefined ? [] : spath);
   this._assertions = [];
   this.contexts = [];
-  this.all();
+  this.validAll();
   return this;
 }
 
@@ -21,7 +21,7 @@ Context.prototype.assertionsValid = function(){
   return this._assertions.every( function(a){ return !!a.value; } );
 }
 
-Context.prototype.all = function(){
+Context.prototype.validAll = function(){
   this.valid = function(){ 
     return this.assertionsValid() && 
            this.contexts.every( function(c){ return c.valid(); } );
@@ -29,7 +29,7 @@ Context.prototype.all = function(){
   return this;
 }
 
-Context.prototype.any = function(){ 
+Context.prototype.validAny = function(){ 
   this.valid = function(){
     return this.assertionsValid() &&
            this.contexts.some( function(c){ return c.valid(); } );
@@ -37,7 +37,7 @@ Context.prototype.any = function(){
   return this;
 }
 
-Context.prototype.none = function(){
+Context.prototype.validNone = function(){
   this.valid = function(){
     return this.assertionsValid() &&
            !this.contexts.some( function(c){ return c.valid(); } );
@@ -45,7 +45,7 @@ Context.prototype.none = function(){
   return this;
 }
 
-Context.prototype.one = function(){
+Context.prototype.validOne = function(){
   this.valid = function(){
     return this.assertionsValid() && oneContextValid.call(this);
 
