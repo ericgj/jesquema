@@ -40,7 +40,7 @@ Context.prototype.validAny = function(){
 Context.prototype.validNone = function(){
   this.valid = function(){
     return this.assertionsValid() &&
-           !this.contexts.some( function(c){ return c.valid(); } );
+           !this.contexts.every( function(c){ return c.valid(); } );
   }
   return this;
 }
@@ -125,9 +125,11 @@ Context.prototype.assertionsWhere = function(assertFilter, contextFilter, accum)
     return a(instance,schema); 
   });
   if (rec.values.length > 0) accum.push(rec);
-  this.contexts.filter(contextFilter).forEach( function(c){
-    c.assertionsWhere(assertFilter, contextFilter, accum);
-  });
+  if (contextFilter(this)){
+    this.contexts.filter(contextFilter).forEach( function(c){
+      c.assertionsWhere(assertFilter, contextFilter, accum);
+    });
+  }
   return accum;
 }
 
