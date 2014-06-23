@@ -29,6 +29,12 @@
     "bindings/dependencies.js",
     "bindings/properties.js",
     "bindings/pattern_properties.js",
-    "bindings/additional_properties.js"
+    "bindings/additional_properties.js",
+    "bindings/multiple_of.js",
+    "bindings/minimum.js",
+    "bindings/maximum.js",
+    "bindings/min_length.js",
+    "bindings/max_length.js",
+    "bindings/pattern.js"
   ]
 }

@@ -18,5 +18,11 @@ module.exports = function(url, bindings, formats){
   schema.properties           = require('./bindings/properties');
   schema.patternProperties    = require('./bindings/pattern_properties');
   schema.additionalProperties = require('./bindings/additional_properties');
+  schema.multipleOf           = require('./bindings/multiple_of');
+  schema.minimum              = require('./bindings/minimum');
+  schema.maximum              = require('./bindings/maximum');
+  schema.minLength            = require('./bindings/min_length');
+  schema.maxLength            = require('./bindings/max_length');
+  schema.pattern              = require('./bindings/pattern');
 
 }

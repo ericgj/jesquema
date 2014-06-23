@@ -111,6 +111,24 @@ describe('basic test', function(){
     })
   })
 
+  it('should validate not anyOf', function(){
+    var schema = { not: { anyOf: [ { type: 'object' }, { type: 'number' } ] } }
+      , valid = 'yes'
+      , invalid = {}
+
+    var v = validate('4').schema(schema)
+    v(valid, function(err,ctx){
+      console.log('not anyOf valid assertions: %o', ctx.assertions());
+      assert(err == null);
+    })
+    
+    v(invalid, function(err,ctx){
+      console.log('not anyOf invalid assertions: %o', ctx.assertions());
+      assert(err);
+      assert(err.message, 'not invalid');
+    })
+  })
+
   it('should validate enum', function(){
     var schema = { enum: ["a", ["b", 2], { c: 3, d: 4 }] }
       , valid = { d: 4, c: 3 }
