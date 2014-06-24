@@ -1,23 +1,24 @@
 
-# json-v
+# jesquema
 
-  JSON Schema validator
+  [JSON Schema][1] validator for javascript
 
 ## Installation
 
   Install with [component(1)](http://component.io):
 
-    $ component install ericgj/json-v
+    $ component install ericgj/jesquema
+
+  _npm install coming soon_
 
 ## API
-
 
 
 ## License
 
   The MIT License (MIT)
 
-  Copyright (c) 2014 <copyright holders>
+  Copyright (c) 2014 Eric Gjertsen <ericgj72@gmail.com>
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -36,3 +37,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
+
+
+[1]: http://json-schema.org/
+

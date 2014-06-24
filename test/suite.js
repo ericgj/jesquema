@@ -2,7 +2,7 @@
 
 var assert = require('assert')
   , type = require('type')
-  , validate = require('json-v')
+  , validate = require('jesquima')
 
 var suite = window['json-schema-test-suite']
 

@@ -1,7 +1,7 @@
 'use strict';
 
 var assert = require('assert')
-  , validate = require('json-v')
+  , validate = require('jesquima')
 
 ///////////////////////////////////
 

@@ -1,8 +1,8 @@
 {
-  "name": "json-v",
-  "repo": "ericgj/json-v",
+  "name": "jesquima",
+  "repo": "ericgj/jesquima",
   "description": "Modular JSON Schema validator",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "keywords": [],
   "dependencies": {
     "component/type": "*"  
