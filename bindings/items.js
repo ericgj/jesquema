@@ -7,8 +7,8 @@ module.exports = function(instance, schema, ctx){
     , additional = schema.additionalItems
 
   // per sec. 8.2.2 of spec
-  if (undefined == items) items = {};
-  if (undefined == additional) additional = {};
+  if (undefined === items) items = {};
+  if (undefined === additional) additional = {};
 
   var itemstype = type(items)
     , additionaltype = type(additional)

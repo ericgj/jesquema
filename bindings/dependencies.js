@@ -5,11 +5,11 @@ module.exports = function(instance, schema, ctx){
   var deps = schema.dependencies
   if (!('object' == type(deps))) return; 
   for (var dep in deps){
-    if (undefined == instance[dep]) return;
+    if (undefined === instance[dep]) return;
     if ('array' == type(dep)){
       var missing = [], nonmissing = []
       for (var i=0;i<dep.length;++i){
-        if (undefined == instance[dep[i]]){
+        if (undefined === instance[dep[i]]){
           missing.push(dep[i])
         } else {
           nonmissing.push(dep[i])

@@ -7,11 +7,11 @@ module.exports = function(instance, schema, ctx){
   var props = schema.properties
 
   // per sec. 8.3.2
-  if (undefined == props) props = {};
+  if (undefined === props) props = {};
 
   var subsch, subinst, subctx
   for (var prop in props){
-    if (undefined == instance[prop]) continue;
+    if (undefined === instance[prop]) continue;
     subsch = props[prop];
     subinst = instance[prop];
     subctx = ctx.subcontext([prop], ['properties',prop]);

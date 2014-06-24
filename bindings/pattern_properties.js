@@ -7,7 +7,7 @@ module.exports = function(instance, schema, ctx){
   var props = schema.patternProperties
 
   // per sec. 8.3.2
-  if (undefined == props) props = {};
+  if (undefined === props) props = {};
 
   var subsch, subinst, matcher, subctx
   for (var rx in props){

@@ -9,9 +9,9 @@ module.exports = function(instance, schema, ctx){
     , schaddprops = schema.additionalProperties
 
   // per sec. 8.3.2
-  if (undefined == schprops) schprops = {};
-  if (undefined == schpatprops) schpatprops = {};
-  if (undefined == schaddprops) schaddprops = {};
+  if (undefined === schprops) schprops = {};
+  if (undefined === schpatprops) schpatprops = {};
+  if (undefined === schaddprops) schaddprops = {};
 
   if (!('object' == type(schprops)) &&
       !('object' == type(schpatprops))) return;
