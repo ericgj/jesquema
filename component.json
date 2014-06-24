@@ -17,6 +17,7 @@
     "context.js",
     "v4.js",
     "deep_equal.js",
+    "ulength.js",
     "bindings/type.js",
     "bindings/all_of.js",
     "bindings/any_of.js",

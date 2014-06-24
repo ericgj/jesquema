@@ -3,6 +3,8 @@
     <title>json-v tests</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link rel="stylesheet" href="mocha.css" />
+    <script src="unorm.js"></script>
+    <script src="codepointat.js"></script>
     <style>
       h1 {
         font-size: 14px;
@@ -31,11 +33,29 @@
     <script src="suite/oneOf.js"></script>
     <script src="suite/not.js"></script>
     <script src="suite/enum.js"></script>
+    <script src="suite/properties.js"></script>
+    <script src="suite/patternProperties.js"></script>
+    <script src="suite/additionalProperties.js"></script>
+    <script src="suite/minProperties.js"></script>
+    <script src="suite/maxProperties.js"></script>
+    <script src="suite/required.js"></script>
+    <script src="suite/dependencies.js"></script>
     <script src="suite/items.js"></script>
     <script src="suite/additionalItems.js"></script>
     <script src="suite/minItems.js"></script>
     <script src="suite/maxItems.js"></script>
     <script src="suite/uniqueItems.js"></script>
+    <script src="suite/multipleOf.js"></script>
+    <script src="suite/minimum.js"></script>
+    <script src="suite/maximum.js"></script>
+    <script src="suite/minLength.js"></script>
+    <script src="suite/maxLength.js"></script>
+    <script src="suite/pattern.js"></script>
+    <!--- disable ref tests
+      <script src="suite/definitions.js"></script> 
+      <script src="suite/ref.js"></script> 
+      <script src="suite/refRemote.js"></script> 
+    -->
     <script src="suite.js"></script>
     <script>
       mocha.run();

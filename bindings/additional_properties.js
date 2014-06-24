@@ -17,12 +17,12 @@ module.exports = function(instance, schema, ctx){
       !('object' == type(schpatprops))) return;
 
   var addprops = Object.keys(instance).filter( function(prop){
-    return !schprops.any( function(schprop){ 
+    return !Object.keys(schprops).some( function(schprop){ 
              return schprop == prop; 
            }) &&
-           !schpatprops.any( function(rx){
+           !Object.keys(schpatprops).some( function(rx){
              var matcher = new RegExp(rx);
-             return matcher.text(prop);
+             return matcher.test(prop);
            });
   });
 
@@ -38,7 +38,7 @@ module.exports = function(instance, schema, ctx){
     if ('object' == addtype){
       this.validate( instance[addprops[i]], 
                      schaddprops, 
-                     ctx.subcontext([addprops[i]],[additionalProperties]) 
+                     ctx.subcontext([addprops[i]],['additionalProperties']) 
                    );
     }
   }

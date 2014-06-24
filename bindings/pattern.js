@@ -5,6 +5,9 @@ module.exports = function(instance, schema, ctx){
   if (!("string" == type(instance))) return;
   var pattern = schema.pattern;
   if (!("string" == type(pattern))) return;
+  
+  if (instance.normalize) instance = instance.normalize();
+
   var pat = new RegExp(pattern);
   ctx.assert(pat.test(instance), 
              "did not match pattern"
