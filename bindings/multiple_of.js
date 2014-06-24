@@ -7,6 +7,6 @@ module.exports = function(instance, schema, ctx){
   if (!("number" == type(multipleOf))) return;
   ctx.assert((instance/multipleOf % 1) == 0, 
               "not a multiple of"
-            )
+            ).property('multipleOf')
 }
 

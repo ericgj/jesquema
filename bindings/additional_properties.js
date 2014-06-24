@@ -32,7 +32,7 @@ module.exports = function(instance, schema, ctx){
     if ('boolean' == addtype){
       ctx.assert( schaddprops,
                   'unknown'
-                ).property(addprops[i])
+                ).property('additionalProperties')
     }
 
     if ('object' == addtype){

@@ -8,7 +8,8 @@ module.exports = function(instance, schema, ctx){
 
   ctx.assert(instance.length <= max, 
              "is greater than the maximum number of items"
-            ).expected("<="+max)
+            ).property('maxItems')
+             .expected("<="+max)
              .actual(instance.length);
 }
 

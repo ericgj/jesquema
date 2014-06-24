@@ -23,19 +23,20 @@ module.exports = function(instance, schema, ctx){
         subctx = ctx.subcontext([i],['items',i])
         ctx.assert( this.validate(instance[i], subsch, subctx ),
                     "item " + (i+1) + " is invalid"
-                  );
+                  ).property('items');
 
       } else if ('boolean' == additionaltype) {
         ctx.assert(additional,
                    "contains additional items"
-                  ).expected(additional)
+                  ).property('items')
+                   .expected(additional)
                    .actual(true);
 
       } else if ('object' == additionaltype) {
         subctx = ctx.subcontext([i],['additionalItems'])
         ctx.assert( this.validate( instance[i], additional, subctx ),
                      "additional item " + (i+1) + " is invalid"
-                  );
+                  ).property('items');
       }
     }
   } else if ('object' == itemstype) {
@@ -44,7 +45,7 @@ module.exports = function(instance, schema, ctx){
        subctx = ctx.subcontext([i],['items'])
        ctx.assert( this.validate( instance[i], items, subctx ),
                    "item " + (i+1) + " is invalid"
-                 );
+                 ).property('items');
      }
   }
 }

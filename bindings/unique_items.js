@@ -19,6 +19,6 @@ module.exports = function(instance, schema, ctx){
   }
   ctx.assert(!match,
              "does not contain unique items"
-            );
+            ).property('uniqueItems');
 }
 

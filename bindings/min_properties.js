@@ -7,7 +7,9 @@ module.exports = function(instance, schema, ctx){
   if (undefined == min) return;
   ctx.assert(keys.length >= min, 
              "too few properties"
-            ).actual(keys.length)
+            ).property('minProperties')
+             .expected('<'+min)
+             .actual(keys.length)
 }
 
 

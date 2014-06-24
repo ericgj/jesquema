@@ -8,7 +8,8 @@ module.exports = function(instance, schema, ctx){
 
   ctx.assert(instance.length >= min, 
              "is less than the minimum number of items"
-            ).expected(">="+min)
+            ).property('minItems')
+             .expected(">="+min)
              .actual(instance.length);
 }
 

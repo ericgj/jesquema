@@ -10,11 +10,15 @@ module.exports = function(instance, schema, ctx){
   if (!!maxExcl){
     ctx.assert(instance < max, 
                "not less than exclusive maximum"
-              ).expected('<' + max).actual(instance)
+              ).property('maximum')
+               .expected('<' + max)
+               .actual(instance)
   } else {
     ctx.assert(instance <= max, 
                "greater than maximum"
-              ).expected('<=' + max).actual(instance)
+              ).property('maximum')
+               .expected('<=' + max)
+               .actual(instance)
   }
 }
 

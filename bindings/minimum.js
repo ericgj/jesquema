@@ -10,11 +10,15 @@ module.exports = function(instance, schema, ctx){
   if (!!minExcl){
     ctx.assert(instance > min, 
                "not greater than exclusive minimum"
-              ).expected('>' + min).actual(instance)
+              ).property('minimum')
+               .expected('>' + min)
+               .actual(instance)
   } else {
     ctx.assert(instance >= min, 
                "less than minimum"
-              ).expected('>' + min).actual(instance)
+              ).property('minimum')
+               .expected('>' + min)
+               .actual(instance)
   }
 }
 

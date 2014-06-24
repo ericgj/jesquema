@@ -92,10 +92,16 @@ Context.prototype.assertEqual = function(act, exp, predicate){
 Context.prototype.error = function(){
   var errs = this.errors();
   if (errs.length == 0) return null;
-  var msg = errs[0].values[0].message;
+  var msg = errs[0].message;
+  var trace = this.trace();
   var e = new Error(msg);
   e.errors = errs;
+  e.trace = trace;
   return e;
+}
+
+Context.prototype.trace = function(){
+  return this.assertions().map( function(a){ return a.messageLong; } );
 }
 
 Context.prototype.assertions = function(){
@@ -116,15 +122,10 @@ Context.prototype.assertionsWhere = function(assertFilter, contextFilter, accum)
   var instance = this.instance
     , schema   = this.schema
 
-  var rec = { 
-    key: JSON.stringify([this.instancePath, this.schemaPath]),
-    instancePath: this.instancePath,
-    schemaPath: this.schemaPath
-  };
-  rec.values = this._assertions.filter(assertFilter).map( function(a){ 
+  var values = this._assertions.filter(assertFilter).map( function(a){ 
     return a(instance,schema); 
   });
-  if (rec.values.length > 0) accum.push(rec);
+  if (values.length > 0) accum.push.apply(accum,values);
   if (contextFilter(this)){
     this.contexts.filter(contextFilter).forEach( function(c){
       c.assertionsWhere(assertFilter, contextFilter, accum);
@@ -182,6 +183,7 @@ function Assertion(value){
     obj.expected = expected;
     obj.actual = actual;
     obj.code = code;
+    obj.level = instancePath.length;
     obj.instance = getPath(instance, obj.instancePath);
     obj.schema   = getPath(schema, obj.schemaPath);
     obj.message  = messageShort();
@@ -196,10 +198,6 @@ function Assertion(value){
     if (instancePath !== undefined && instancePath.length > 0){
       ret.push(instancePath.join('/'));
     }
-    if (property !== undefined && property.length > 0){
-      ret.push(property);
-    }
-
     ret.push( value ? "valid" : (predicate || "invalid") );
 
     if (!value && code){
@@ -211,6 +209,9 @@ function Assertion(value){
   function messageLong(){
     var ret = [];
     ret.push( messageShort() );
+    if (property !== undefined && property.length > 0){
+      ret.push(property);
+    }
     if (!value && expected !== undefined){ 
       ret.push( "expected " + JSON.stringify(expected) + 
                 ", was " + JSON.stringify(actual)

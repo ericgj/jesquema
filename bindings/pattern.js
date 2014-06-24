@@ -8,6 +8,7 @@ module.exports = function(instance, schema, ctx){
   var pat = new RegExp(pattern);
   ctx.assert(pat.test(instance), 
              "did not match pattern"
-            ).expected(pattern)
+            ).property('pattern')
+             .expected(pattern)
              .actual(instance);
 }

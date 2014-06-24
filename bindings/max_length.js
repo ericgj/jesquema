@@ -8,7 +8,8 @@ module.exports = function(instance, schema, ctx){
 
   ctx.assert(instance.length <= max, 
              "is greater than the minimum length"
-            ).expected("<="+max)
+            ).property('maxLength')
+             .expected("<="+max)
              .actual(instance.length);
 }
 

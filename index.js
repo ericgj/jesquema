@@ -54,7 +54,9 @@ module.exports = function(version){
     var v = bind(validator());
     var ctx = Context(instance,schema);
     v.validate(instance, schema, ctx);
-    var err = ctx.error();
+    var valid = ctx.valid();
+    var err;
+    if (!valid) err = ctx.error();
     if (throwerr && err) throw err;
     if (fn) fn(err, ctx);
     return ctx.valid();

@@ -20,6 +20,8 @@ module.exports = function(instance, schema, ctx){
   subctx.assert( 
     count == 1,
     (count == 0 ? 'no conditions valid' : 'more than one condition valid')
-  ).actual(count).expected(1)
+  ).property('oneOf')
+   .actual(count)
+   .expected(1);
 }
 

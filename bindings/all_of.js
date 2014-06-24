@@ -14,6 +14,6 @@ module.exports = function(instance, schema, ctx){
       return self.validate( instance, subsch, subctx.subcontext([],[i]) );
     }),
     'not all conditions valid'
-  )
+  ).property('allOf');
 }
 

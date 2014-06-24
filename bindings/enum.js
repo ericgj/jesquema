@@ -15,6 +15,7 @@ module.exports = function(instance, schema, ctx){
   }
 
   ctx.assert( found, 'not enumerated' )
+       .property('enum')
        .expected(e)
        .actual(instance);
 }

@@ -7,7 +7,9 @@ module.exports = function(instance, schema, ctx){
   if (undefined == max) return;
   ctx.assert(keys.length >= max, 
              "too many properties"
-            ).actual(keys.length)
+            ).property('maxProperties')
+             .expected('<'+max)
+             .actual(keys.length)
 }
 
 

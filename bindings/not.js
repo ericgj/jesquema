@@ -12,5 +12,5 @@ module.exports = function(instance, schema, ctx){
   subctx.assert(
     !this.validate( instance, not, subctx.subcontext([],[]) ),
     'not invalid'
-  )
+  ).property('not');
 }
