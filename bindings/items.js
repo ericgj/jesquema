@@ -10,10 +10,10 @@ module.exports = function(instance, schema, ctx){
   if (undefined == items) items = {};
   if (undefined == additional) additional = {};
 
-  if (!('object' == itemstype) && !('array' == itemstype)) return;
-
   var itemstype = type(items)
     , additionaltype = type(additional)
+
+  if (!('object' == itemstype) && !('array' == itemstype)) return;
 
   if ('array' == itemstype){
     var subsch, subctx
@@ -28,7 +28,7 @@ module.exports = function(instance, schema, ctx){
       } else if ('boolean' == additionaltype) {
         ctx.assert(additional,
                    "contains additional items"
-                  ).property('items')
+                  ).property('additionalItems')
                    .expected(additional)
                    .actual(true);
 
@@ -36,7 +36,7 @@ module.exports = function(instance, schema, ctx){
         subctx = ctx.subcontext([i],['additionalItems'])
         ctx.assert( this.validate( instance[i], additional, subctx ),
                      "additional item " + (i+1) + " is invalid"
-                  ).property('items');
+                  ).property('additionalItems');
       }
     }
   } else if ('object' == itemstype) {

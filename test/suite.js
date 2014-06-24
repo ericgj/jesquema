@@ -46,10 +46,15 @@ function genTests(obj){
 
         ////// This is strictly for debugging. If all tests pass, none of this will output.
         if (exp !== act){
-          console.error(testcase.description + ' : %o , expected: %s', [schema, instance], exp);
-          var trace = ctx.trace()
+          console.error(testcase.description + ' : %o , expected: %s', [instance, schema], exp);
+          var trace = ctx.assertions();
           for (var i=0;i<trace.length;++i){
-            console.log("  " + trace[i]);
+            var rec = trace[i], msg = rec.messageLong, lvl = rec.level, iserr = !rec.value
+            // if (iserr){
+            //  console.error( Array((lvl+1) * 2).join(" ") + msg );
+            //} else {
+              console.log( Array((lvl+1) * 2).join(" ") + msg );
+            //}
           }
         }
         //////

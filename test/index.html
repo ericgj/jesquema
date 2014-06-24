@@ -23,7 +23,20 @@
     <script src="../build/build.js"></script>
     <script src="mocha.js"></script>
     <script>mocha.setup('bdd')</script>
-    <script src="tests.js"></script>
+    <!-- <script src="tests.js"></script> -->
+    <script>window['json-schema-test-suite'] = {};</script>
+    <script src="suite/type.js"></script>
+    <script src="suite/allOf.js"></script>
+    <script src="suite/anyOf.js"></script>
+    <script src="suite/oneOf.js"></script>
+    <script src="suite/not.js"></script>
+    <script src="suite/enum.js"></script>
+    <script src="suite/items.js"></script>
+    <script src="suite/additionalItems.js"></script>
+    <script src="suite/minItems.js"></script>
+    <script src="suite/maxItems.js"></script>
+    <script src="suite/uniqueItems.js"></script>
+    <script src="suite.js"></script>
     <script>
       mocha.run();
     </script>
