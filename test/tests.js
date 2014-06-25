@@ -152,7 +152,7 @@ describe('basic test', function(){
       , valid = { email: "a@b.com" }
       , invalid = { email: "foo@bar" }
 
-    var v = validate('4').schema(schema)
+    var v = validate().schema(schema)
     v(valid, function(err,ctx){
       console.log('format email valid assertions: %o', ctx.assertions());
       assert(err == null);
@@ -164,5 +164,17 @@ describe('basic test', function(){
       assert(err.message, 'not enumerated');
     })
   })
+  
+  it('should disable format validation if specified', function(){
+    var schema = { format: 'uri' }
+      , instance = '--invalid--'
 
+    var v = validate('4').schema(schema).disableFormats()
+    v(instance, function(err,ctx){
+      console.log('disable format validation assertions: %o', ctx.assertions());
+      assert(err == null);
+    })
+
+  })
+   
 })

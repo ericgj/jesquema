@@ -22,7 +22,10 @@ module.exports = function(version){
   var schema = {}
     , abort = false
     , formats = {}
+    , disableFormats = false
     , throwerr = false
+
+  if (arguments.length == 0) version = 'http://json-schema.org/schema#' ;
 
   validate.schema = function(_){
     if (arguments.length == 0) return schema;
@@ -35,7 +38,7 @@ module.exports = function(version){
   }
 
   validate.abort = function(_){
-    abort = (undefined == _ || !!_)
+    abort = (undefined === _ || !!_)
     return this;
   }
 
@@ -44,8 +47,13 @@ module.exports = function(version){
     formats[name] = fn; return this;
   }
 
+  validate.disableFormats = function(_){
+    disableFormats = (undefined === _ || !!_)
+    return this;
+  }
+
   validate.throw = function(_){
-    throwerr = (undefined == _ || !!_); 
+    throwerr = (undefined === _ || !!_); 
     return this;
   }
 
@@ -80,6 +88,7 @@ module.exports = function(version){
     self.formats = {};
 
     self.getFormat = function(name){
+      if (disableFormats) return;
       var fmt = this.formats[name];
       if (undefined === fmt) return;
       if ('function' == type(fmt)) return fmt;
