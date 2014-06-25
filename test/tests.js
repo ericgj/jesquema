@@ -147,4 +147,22 @@ describe('basic test', function(){
     })
   })
 
+  it('should validate email format', function(){
+    var schema = { properties: { email: { format: 'email' } } }
+      , valid = { email: "a@b.com" }
+      , invalid = { email: "foo@bar" }
+
+    var v = validate('4').schema(schema)
+    v(valid, function(err,ctx){
+      console.log('format email valid assertions: %o', ctx.assertions());
+      assert(err == null);
+    })
+    
+    v(invalid, function(err,ctx){
+      console.log('format email invalid assertions: %o', ctx.assertions());
+      assert(err);
+      assert(err.message, 'not enumerated');
+    })
+  })
+
 })

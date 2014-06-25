@@ -39,14 +39,14 @@ module.exports = function(version){
     return this;
   }
 
+  validate.format = function(name,fn){
+    if (arguments.length == 1) return formats[name];
+    formats[name] = fn; return this;
+  }
+
   validate.throw = function(_){
     throwerr = (undefined == _ || !!_); 
     return this;
-  }
-
-  validate.format = function(name,fn){
-    if (arguments.length == 1) return formats[name];
-    formats[name] = formatfn(fn); return this;
   }
 
   function validate(instance, fn){
@@ -79,6 +79,16 @@ module.exports = function(version){
     var self = {};
     self.formats = {};
 
+    self.getFormat = function(name){
+      var fmt = this.formats[name];
+      if (undefined === fmt) return;
+      if ('function' == type(fmt)) return fmt;
+      return function(instance){
+        if (undefined === instance) return false;
+        return !!fmt.test(instance);
+      }
+    }
+        
     self.validate = function(instance, schema, ctx){
       for (var k in schema){
         if (!has.call(schema,k)) continue;
@@ -99,19 +109,12 @@ module.exports = function(version){
     extend( target, 
             BINDINGS[version] || BINDINGS[ SCHEMAURLS[version] ] || {}
           );
-    extend( target.formats, 
-            FORMATS[version] || FORMATS[ SCHEMAURLS[version] ] || {},
+    
+    extend( target.formats,
+            FORMATS[version] || FORMATS[ SCHEMAURLS[version] ] || {} ,
             formats
           );
     return target;
-  }
-
-  function formatfn(r){
-    if (typeof r == 'function') return r;
-    return function(instance){ 
-      if (val == undefined) return false;
-      return !!r.test(instance.toString()); 
-    };
   }
 
   return validate;
@@ -130,5 +133,4 @@ function extend(obj) {
   }
   return obj;
 };
-
 
