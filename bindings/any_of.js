@@ -8,11 +8,16 @@ module.exports = function(instance, schema, ctx){
 
   var subctx = ctx.subcontext([],['anyOf']).validAny()
     , self = this
+    , count = 0
 
-  subctx.assert(
-    anyOf.some( function(subsch,i){
-      return self.validate( instance, subsch, subctx.subcontext([],[i]) );
-    }),
+  for (var i=0;i<anyOf.length;++i){
+    var subsch = anyOf[i];
+    var valid = this.validate( instance, subsch, subctx.subcontext([],[i]) );
+    if (valid) count++;
+  }
+
+  subctx.assert( 
+    count > 0,
     'not any conditions valid'
   ).property('anyOf');
 }

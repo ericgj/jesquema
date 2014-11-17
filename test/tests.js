@@ -2,6 +2,7 @@
 
 var assert = require('assert')
   , validate = require('jesquema')
+  , has = hasOwnProperty
 
 ///////////////////////////////////
 
@@ -365,5 +366,104 @@ describe('context.validSchema tests', function(){
       assert(err != null);
       assert(actual.length == 0);
     });
+  })
+})
+
+
+describe('validate.use', function(){
+
+  it('should bind method to context instance, not prototype', function(){
+    var noop = function(){  };
+    var v1 = validate('4').schema({});
+    var v2 = validate('4').use('test',noop).schema({});
+    var actual1 = v1.results('hello');
+    var actual2 = v2.results('hello');
+    assert( !has.call(actual1,'test') );
+    assert( has.call(actual2,'test') );
+  })
+
+  it('should bind methods to subcontexts', function(){
+    var noop = function(){ };
+    function evalctx(fn){ 
+      return function(ctx){
+        return fn(ctx) && ctx.contexts.every(evalctx(fn));
+      }
+    }
+
+    var schema = { 'properties': { 'a': {} } };
+    var v = validate('4').use('test',noop).use('test2',noop).schema(schema);
+    var actual = v.results({a: 'hello'});
+    console.log('validate.use, bind methods to subcontexts: %o', actual);
+    assert( evalctx(function(ctx){ return has.call(ctx,'test'); })(actual) );
+    assert( evalctx(function(ctx){ return has.call(ctx,'test2'); })(actual) );
+  })
+
+  it('method should execute', function(){
+    var links = function(){
+      return this.validSchema().reduce( function(accum,s){
+        accum.push.apply(accum, s.links || []);
+        return accum;
+      }, []);
+    }
+
+    var schema = {
+      'links': [
+        {'rel': 'self'}
+      ],
+      'anyOf': [
+        {
+          'properties': {
+            'status': { 'enum': ['new'] }
+          },
+          'links': [
+            {'rel': 'create'}
+          ]
+        },
+        {
+          'properties': {
+            'status': { 'enum': ['draft','in-process'] }
+          },
+          'links': [
+            {'rel': 'cancel'},
+            {'rel': 'finalize'}
+          ],
+        },
+        {
+          'properties': {
+            'status': { 'enum': ['final'] }
+          },
+          'links': [
+            {'rel': 'delete'}
+          ]
+        },
+        { 
+          'properties': {
+            'status': { 'enum': ['draft','in-process','final'] }
+          },
+          'links': [
+            {'rel': 'update'}
+          ]
+        }
+      ]
+    }
+
+    var v = validate('4').use('links',links).schema(schema);
+    var finder = function(rel){ return function(link){ return link.rel == rel; } };
+
+    var actual = v.results( { 'status': 'new' } ).links();
+    console.log('validate.use, links, status new: %o', actual);
+    assert.equal(actual.length,2);
+    assert(actual.filter(finder('self')).length == 1);
+    assert(actual.filter(finder('create')).length == 1);
+
+    var results = v.results( { 'status': 'draft' } )
+    var actual = results.links();
+    console.log('validate.use, links, status draft: %o', actual);
+    assert.equal(actual.length,4);
+    assert(actual.filter(finder('self')).length == 1);
+    assert(actual.filter(finder('cancel')).length == 1);
+    assert(actual.filter(finder('finalize')).length == 1);
+    assert(actual.filter(finder('update')).length == 1);
+
   })
 })

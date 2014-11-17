@@ -9,11 +9,21 @@ function Context(instance,schema,ipath,spath){
   if (!(this instanceof Context)) return new Context(instance,schema,ipath,spath);
   this.instance = instance;
   this.schema = schema;
-  this.instancePath = (ipath == undefined ? [] : ipath);
-  this.schemaPath = (spath == undefined ? [] : spath);
+  this.instancePath = (ipath === undefined ? [] : ipath);
+  this.schemaPath = (spath === undefined ? [] : spath);
   this._assertions = [];
+  this._delegate = undefined;
   this.contexts = [];
   this.validAll();
+  return this;
+}
+
+// note: methods on instance and subcontexts (not prototype)
+Context.prototype.delegate = function(_){
+  this._delegate = _; 
+  for (var k in this._delegate){
+    if (has.call(this._delegate,k)) this[k] = this._delegate[k].bind(this)
+  }
   return this;
 }
 
@@ -68,8 +78,9 @@ Context.prototype.validSchema = function(accum){
   var schema = this.schema
     , schemaPath = this.schemaPath
     , instancePath = this.instancePath
+    , combos = ['allOf','anyOf','oneOf','not','dependencies']
     , iscombo = schemaPath.length > 0 &&
-                ['allOf','anyOf','oneOf','not'].indexOf(schemaPath[schemaPath.length-1]) >= 0
+                combos.indexOf(schemaPath[schemaPath.length-1]) >= 0
   if (instancePath.length == 0 && !iscombo )
     accum.push( getPath(schema, schemaPath) );
   this.contexts.forEach( function(c){
@@ -88,6 +99,7 @@ Context.prototype.subcontext = function(ipath,spath){
                      ipathsub,
                      spathsub
                     );
+  if (!(this._delegate === undefined)) ctx.delegate(this._delegate);
   this.contexts.push(ctx);
   return ctx;
 }

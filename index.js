@@ -24,6 +24,7 @@ module.exports = function(version){
     , formats = {}
     , disableFormats = false
     , throwerr = false
+    , delegate = {}
 
   if (arguments.length == 0) version = 'http://json-schema.org/schema#' ;
 
@@ -57,6 +58,11 @@ module.exports = function(version){
     return this;
   }
 
+  validate.use = function(name,fn){
+    delegate[name] = fn;
+    return this;
+  }
+
   // sugar
   function validate(instance, fn){
     var ctx = validate.results(instance);
@@ -71,7 +77,7 @@ module.exports = function(version){
   validate.results = function(instance){
     if (has.call(schema,'$schema')) this.version(schema['$schema']);
     var v = bind(validator());
-    var ctx = Context(instance,schema);
+    var ctx = Context(instance,schema).delegate(delegate);
     v.validate(instance, schema, ctx);
     return ctx;
   }
