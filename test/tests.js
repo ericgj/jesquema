@@ -178,3 +178,192 @@ describe('basic test', function(){
   })
    
 })
+
+
+describe('context.validSchema tests', function(){
+
+  it('for simple schemas', function(){
+    var schema = { "type": "object" }
+      , valid = {}
+      , invalid = 3
+    var v = validate('4').schema(schema)
+    v(valid, function(err,ctx){
+      var actual = ctx.validSchema();
+      console.log('validSchema, simple schema, valid: %o', actual);
+      assert(err == null);
+      assert(actual.length == 1);
+      assert(actual[0] === schema);
+    });
+
+    v(invalid, function(err,ctx){
+      var actual = ctx.validSchema();
+      console.log('validSchema, simple schema, invalid: %o', actual);
+      assert(err != null);
+      assert(actual.length == 0);
+    });
+ 
+  })
+  
+  it('for allOf schemas', function(){
+    var schema = { "type": "object", "allOf": [ { "required": ["a","b"] }, { "required": ["c"] } ] }
+      , valid = {"a": 1, "b": 2, "c": 3, "d": 4}
+      , invalid = {"a": 1, "c": 2, "d": 3}
+    var v = validate('4').schema(schema)
+    v(valid, function(err,ctx){
+      var actual = ctx.validSchema();
+      console.log('validSchema, allOf schema, valid: %o', actual);
+      assert(err == null);
+      assert(actual.length == 3);
+      assert(actual[0] === schema);
+      assert(actual[1] === schema.allOf[0]);
+      assert(actual[2] === schema.allOf[1]);
+    });
+
+    v(invalid, function(err,ctx){
+      var actual = ctx.validSchema();
+      console.log('validSchema, allOf schema, invalid: %o', actual);
+      assert(err != null);
+      assert(actual.length == 0);
+    });
+  })
+
+  it('for anyOf schemas', function(){
+    var schema = { "type": "object", "anyOf": [ { "required": ["a","b"] }, { "required": ["c"] } ] }
+      , valid = {"a": 1, "b": 2, "d": 4}
+      , invalid = {"a": 1, "d": 3}
+    var v = validate('4').schema(schema)
+    v(valid, function(err,ctx){
+      var actual = ctx.validSchema();
+      console.log('validSchema, anyOf schema, valid: %o', actual);
+      assert(err == null);
+      assert(actual.length == 2);
+      assert(actual[0] === schema);
+      assert(actual[1] === schema.anyOf[0]);
+    });
+
+    v(invalid, function(err,ctx){
+      var actual = ctx.validSchema();
+      console.log('validSchema, anyOf schema, invalid: %o', actual);
+      assert(err != null);
+      assert(actual.length == 0);
+    });
+  })
+
+  it('for oneOf schemas', function(){
+    var schema = { "type": "object", "oneOf": [ { "required": ["a","b"] }, { "required": ["c"] } ] }
+      , valid = {"c": 1, "d": 2, "b": 4}
+      , invalid = {"a": 1, "b": 2, "c": 3, "d": 4}
+    var v = validate('4').schema(schema)
+    v(valid, function(err,ctx){
+      var actual = ctx.validSchema();
+      console.log('validSchema, oneOf schema, valid: %o', actual);
+      assert(err == null);
+      assert(actual.length == 2);
+      assert(actual[0] === schema);
+      assert(actual[1] === schema.oneOf[1]);
+    });
+
+    v(invalid, function(err,ctx){
+      var actual = ctx.validSchema();
+      console.log('validSchema, oneOf schema, invalid: %o', actual);
+      assert(err != null);
+      assert(actual.length == 0);
+    });
+  })
+
+  it('for not schemas', function(){
+    var schema = { "type": "object", "not": { "properties": { "a": { "type": "number" } } } }
+      , valid = {"a": null, "d": 2, "b": 4}
+      , invalid = {"a": 1, "b": 2, "c": 3, "d": 4}
+    var v = validate('4').schema(schema)
+    v(valid, function(err,ctx){
+      var actual = ctx.validSchema();
+      console.log('validSchema, not schema, valid: %o', actual);
+      assert(err == null);
+      assert(actual.length == 1);
+      assert(actual[0] === schema);
+    });
+
+    v(invalid, function(err,ctx){
+      var actual = ctx.validSchema();
+      console.log('validSchema, not schema, invalid: %o', actual);
+      assert(err != null);
+      assert(actual.length == 0);
+    });
+  })
+ 
+  it('for nested schemas', function(){
+    var schema = { 
+      "type": "object", 
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "anyOf": [
+                { "required": ["a"] },
+                { "required": ["b"] }
+              ],
+            },
+            {
+              "properties": {
+                "a": {
+                  "enum": [null,1]
+                },
+                "b": {
+                  "enum": [null,2]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "required": ["c","d"],
+          "properties": {
+            "c": { "type": "string" },
+            "d": { "type": ["null", "string"] }
+          }
+        }
+      ]
+    };
+    var valid1 = {"a": null}
+      , valid2 = {"c": "hello", "d": null }
+      , invalid1 = {"b": 3, "a": null }
+      , invalid2 = {"a": 1, "b": 2, "c": "eric", "d": null}
+    var v = validate('4').schema(schema)
+
+    v(valid1, function(err,ctx){
+      var actual = ctx.validSchema();
+      console.log('validSchema, nested schema, valid 1: %o', actual);
+      assert(err == null);
+      assert(actual.length == 5);
+      assert(actual[0] === schema);
+      assert(actual[1] === schema.oneOf[0]);
+      assert(actual[2] === schema.oneOf[0].allOf[0]);
+      assert(actual[3] === schema.oneOf[0].allOf[0].anyOf[0]);
+      assert(actual[4] === schema.oneOf[0].allOf[1]);
+    });
+
+    v(valid2, function(err,ctx){
+      var actual = ctx.validSchema();
+      console.log('validSchema, nested schema, valid 2: %o', actual);
+      assert(err == null);
+      assert(actual.length == 2);
+      assert(actual[0] === schema);
+      assert(actual[1] === schema.oneOf[1]);
+    });
+
+    v(invalid1, function(err,ctx){
+      var actual = ctx.validSchema();
+      console.log('validSchema, nested schema, invalid 1: %o', actual);
+      assert(err != null);
+      assert(actual.length == 0);
+    });
+
+    v(invalid2, function(err,ctx){
+      var actual = ctx.validSchema();
+      console.log('validSchema, nested schema, invalid 2: %o', actual);
+      assert(err != null);
+      assert(actual.length == 0);
+    });
+  })
+})

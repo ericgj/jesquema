@@ -61,6 +61,23 @@ Context.prototype.validOne = function(){
   return this;
 }
 
+// TODO: better way to determine 'combo' nodes
+Context.prototype.validSchema = function(accum){
+  accum = accum || [];
+  if (!this.valid()) return accum;
+  var schema = this.schema
+    , schemaPath = this.schemaPath
+    , instancePath = this.instancePath
+    , iscombo = schemaPath.length > 0 &&
+                ['allOf','anyOf','oneOf','not'].indexOf(schemaPath[schemaPath.length-1]) >= 0
+  if (instancePath.length == 0 && !iscombo )
+    accum.push( getPath(schema, schemaPath) );
+  this.contexts.forEach( function(c){
+    c.validSchema(accum);
+  })
+  return accum;
+}
+
 Context.prototype.subcontext = function(ipath,spath){
   var ipathsub = this.instancePath.slice(0)
     , spathsub = this.schemaPath.slice(0)
