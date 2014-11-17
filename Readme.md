@@ -3,6 +3,15 @@
 
   [JSON Schema][1] validator for javascript
 
+## Features
+  
+  - modular; for example, v4 of the spec is entirely implemented by plugins
+  - built-in formats for date-time, email, hostname, ipv4, ipv6, uri
+    as well as ISO8610 datetime, date, time, regex strings
+  - extensive error/assertion reporting
+  - schema flattening (i.e. list top-level schemas the instance is valid 
+    against).
+  
 ## Installation
 
   Install with [component(1)](http://component.io):
@@ -11,7 +20,15 @@
 
   _npm install coming soon_
 
+## Example
+
+
 ## API
+
+
+## TODO
+
+- JSON refs
 
 
 ## License
