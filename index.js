@@ -57,11 +57,9 @@ module.exports = function(version){
     return this;
   }
 
+  // sugar
   function validate(instance, fn){
-    if (has.call(schema,'$schema')) this.version(schema['$schema']);
-    var v = bind(validator());
-    var ctx = Context(instance,schema);
-    v.validate(instance, schema, ctx);
+    var ctx = validate.results(instance);
     var valid = ctx.valid();
     var err;
     if (!valid) err = ctx.error();
@@ -70,15 +68,14 @@ module.exports = function(version){
     return ctx.valid();
   }
 
-  // sugar
   validate.results = function(instance){
-    var ret
-    validate(instance, function(err, ctx){
-      ret = ctx;
-    });
-    return ret;
+    if (has.call(schema,'$schema')) this.version(schema['$schema']);
+    var v = bind(validator());
+    var ctx = Context(instance,schema);
+    v.validate(instance, schema, ctx);
+    return ctx;
   }
-    
+
 
   // private
 
