@@ -9,8 +9,9 @@
   - built-in formats for date-time, email, hostname, ipv4, ipv6, uri
     as well as ISO8610 datetime, date, time, regex strings
   - extensive error/assertion reporting
-  - schema flattening (i.e. list top-level schemas the instance is valid 
-    against).
+  - extendable context (results) object
+  - schema flattening (i.e. list top-level schemas that the instance is valid 
+    against, for extracting descriptive data about the instance).
   
 ## Installation
 
