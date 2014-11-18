@@ -398,14 +398,7 @@ describe('validate.use', function(){
     assert( evalctx(function(ctx){ return has.call(ctx,'test2'); })(actual) );
   })
 
-  it('method should execute', function(){
-    var links = function(){
-      return this.validSchema().reduce( function(accum,s){
-        accum.push.apply(accum, s.links || []);
-        return accum;
-      }, []);
-    }
-
+  it('built-in v4 links method should execute', function(){
     var schema = {
       'links': [
         {'rel': 'self'}
@@ -447,7 +440,7 @@ describe('validate.use', function(){
       ]
     }
 
-    var v = validate('4').use('links',links).schema(schema);
+    var v = validate('4').schema(schema);
     var finder = function(rel){ return function(link){ return link.rel == rel; } };
 
     var actual = v.results( { 'status': 'new' } ).links();

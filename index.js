@@ -11,11 +11,13 @@ var SCHEMAURLS = {
 
 var BINDINGS = {}
   , FORMATS = {}
+  , DELEGATES = {}
 
-v4( SCHEMAURLS['4'], BINDINGS, FORMATS );
+v4( SCHEMAURLS['4'], BINDINGS, FORMATS, DELEGATES );
 
 BINDINGS['http://json-schema.org/schema#'] = BINDINGS[ SCHEMAURLS['4'] ];
 FORMATS[ 'http://json-schema.org/schema#'] = FORMATS[  SCHEMAURLS['4'] ];
+DELEGATES[ 'http://json-schema.org/schema#'] = DELEGATES[  SCHEMAURLS['4'] ];
 
 module.exports = function(version){
 
@@ -25,8 +27,6 @@ module.exports = function(version){
     , disableFormats = false
     , throwerr = false
     , delegate = {}
-
-  if (arguments.length == 0) version = 'http://json-schema.org/schema#' ;
 
   validate.schema = function(_){
     if (arguments.length == 0) return schema;
@@ -48,6 +48,11 @@ module.exports = function(version){
     formats[name] = fn; return this;
   }
 
+  validate.use = function(name,fn){
+    if (arguments.length == 1) return delegate[name];
+    delegate[name] = fn; return this;
+  }
+
   validate.disableFormats = function(_){
     disableFormats = (undefined === _ || !!_)
     return this;
@@ -55,11 +60,6 @@ module.exports = function(version){
 
   validate.throw = function(_){
     throwerr = (undefined === _ || !!_); 
-    return this;
-  }
-
-  validate.use = function(name,fn){
-    delegate[name] = fn;
     return this;
   }
 
@@ -77,7 +77,11 @@ module.exports = function(version){
   validate.results = function(instance){
     if (has.call(schema,'$schema')) this.version(schema['$schema']);
     var v = bind(validator());
-    var ctx = Context(instance,schema).delegate(delegate);
+    var d = extend( {}, 
+                    DELEGATES[version] || DELEGATES[ SCHEMAURLS[version] ] || {},
+                    delegate
+                  );
+    var ctx = Context(instance,schema).delegate(d);
     v.validate(instance, schema, ctx);
     return ctx;
   }
@@ -127,6 +131,11 @@ module.exports = function(version){
             formats
           );
     return target;
+  }
+
+
+  if (arguments.length == 0) {
+    validate.version('http://json-schema.org/schema#') ;
   }
 
   return validate;

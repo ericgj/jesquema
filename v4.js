@@ -1,9 +1,10 @@
 'use strict';
 
-module.exports = function(url, bindings, formats){
+module.exports = function(url, bindings, formats, delegates){
 
   var schema = bindings[url] = {};
   var fmts = formats[url] = {};
+  var delegate = delegates[url] = {};
 
   schema.type                 = require('./bindings/type');
   schema.allOf                = require('./bindings/all_of');
@@ -89,7 +90,15 @@ module.exports = function(url, bindings, formats){
   fmts.time     = /^([01]\d|2[0-3])((:?)[0-5]\d)((:?)[0-5]\d)$/ ;
   
   fmts.regex    = formatRegExp ;
-  
+ 
+
+  delegate.links = function(){
+    return this.validSchema().reduce( function(accum,schema){
+      accum.push.apply(accum, schema.links || []);
+      return accum;
+    }, []);
+  }
+
 }
 
 
