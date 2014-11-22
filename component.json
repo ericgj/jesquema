@@ -2,7 +2,7 @@
   "name": "jesquema",
   "repo": "ericgj/jesquema",
   "description": "Modular JSON Schema validator",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "keywords": [],
   "dependencies": {
     "component/type": "*"  
