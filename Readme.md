@@ -29,7 +29,7 @@
 
 ## TODO
 
-- JSON refs
+- remote refs
 
 
 ## License
