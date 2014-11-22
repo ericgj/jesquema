@@ -15,6 +15,9 @@
   "scripts": [
     "index.js",
     "context.js",
+    "cache.js",
+    "pointer.js",
+    "url.js",
     "v4.js",
     "deep_equal.js",
     "ulength.js",

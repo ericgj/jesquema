@@ -1,9 +1,14 @@
 'use strict';
 
+var URL = require('./url');
+var Pointer = require('./pointer');
 var has = hasOwnProperty;
 var truefn = function(){ return true; }
 
 module.exports = Context;
+
+// TODO: refactor this using Pointer
+// basically the signature should be Context(instancePointer,schemaPointer)
 
 function Context(instance,schema,ipath,spath){
   if (!(this instanceof Context)) return new Context(instance,schema,ipath,spath);
@@ -25,6 +30,20 @@ Context.prototype.delegate = function(_){
     if (has.call(this._delegate,k)) this[k] = this._delegate[k].bind(this)
   }
   return this;
+}
+
+Context.prototype.scope = function(){
+  var schema = this.schema;
+  var path  = this.schemaPath;
+  var base = URL('',schema['id']);
+  return this.schemaPath.reduce( function(url,_,i){
+    var s = getPath(schema,path.slice(0,i+1));
+    if (has.call(s,'id')){
+      return URL(s['id'],url).toString();
+    } else {
+      return url;
+    }
+  }, base);
 }
 
 Context.prototype.assertionsValid = function(){
@@ -98,6 +117,18 @@ Context.prototype.subcontext = function(ipath,spath){
                      this.schema, 
                      ipathsub,
                      spathsub
+                    );
+  if (!(this._delegate === undefined)) ctx.delegate(this._delegate);
+  this.contexts.push(ctx);
+  return ctx;
+}
+
+// apply external (ref) schema to current instance
+Context.prototype.graftContext = function(schema,spath){
+  var ctx =  Context(this.instance,
+                     schema,
+                     this.instancePath.slice(0),
+                     spath.slice(0)
                     );
   if (!(this._delegate === undefined)) ctx.delegate(this._delegate);
   this.contexts.push(ctx);
@@ -258,18 +289,10 @@ function Assertion(value){
 
 function joinPath(){
   return [].slice.call(arguments,0).map( function(a){
-    return (a == undefined ? '' : a);
+    return (a === undefined ? '' : a);
   }).join('/');
 }
 
-
-function getPath(instance,path){
-  if (!(typeof instance == 'object')) return instance;  // not object or array
-  if (0==path.length) return instance;
-  var prop = path[0]
-    , rest = path.slice(1)
-  if (undefined == instance[prop]) return;
-  var branch = instance[prop];
-  return getPath(branch,rest);
+function getPath(obj,path){
+  return new Pointer(obj,path).target();
 }
-

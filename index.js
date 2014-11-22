@@ -4,6 +4,7 @@ var has = hasOwnProperty;
 var type = require('type');
 var v4 = require('./v4');
 var Context = require('./context');
+var Cache = require('./cache');
 
 var SCHEMAURLS = {
   '4': 'http://json-schema.org/draft-04/schema#'
@@ -76,20 +77,20 @@ module.exports = function(version){
 
   validate.results = function(instance){
     if (has.call(schema,'$schema')) this.version(schema['$schema']);
-    var v = bind(validator());
+    var v = bind(validator(Cache()));
     var d = extend( {}, 
                     DELEGATES[version] || DELEGATES[ SCHEMAURLS[version] ] || {},
                     delegate
                   );
     var ctx = Context(instance,schema).delegate(d);
-    v.validate(instance, schema, ctx);
+    v.validate(instance, schema, ctx, true);
     return ctx;
   }
 
 
   // private
 
-  function validator(){
+  function validator(cache){
     
     var self = {};
     self.formats = {};
@@ -105,7 +106,16 @@ module.exports = function(version){
       }
     }
         
-    self.validate = function(instance, schema, ctx){
+    self.validate = function(instance, schema, ctx, top){
+      if (top || has.call(schema,'id')){
+        cache.add(schema);
+      }
+
+      if (has.call(schema,'$ref')){
+        var ref = cache.get( schema['$ref'], ctx.scope() );
+        return self.validate(instance, ref.target(), ctx.graftContext(ref.object, ref.path));
+      }
+
       for (var k in schema){
         if (!has.call(schema,k)) continue;
         if (!this[k]) continue;   // no such bound function, ignore
