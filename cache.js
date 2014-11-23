@@ -1,6 +1,7 @@
 'use strict';
 var URL = require('./url');
 var Pointer = require('./pointer');
+var type = require('type');
 
 module.exports = Cache;
 
