@@ -2,6 +2,7 @@
 
 var has = hasOwnProperty;
 var type = require('type');
+var asyncEach = require('async-each');
 var v4 = require('./v4');
 var Context = require('./context');
 var Cache = require('./cache');
@@ -28,6 +29,8 @@ module.exports = function(version){
     , disableFormats = false
     , throwerr = false
     , delegate = {}
+    , cache = Cache()
+    , agent = jsonXHR
 
   validate.schema = function(_){
     if (arguments.length == 0) return schema;
@@ -49,11 +52,6 @@ module.exports = function(version){
     formats[name] = fn; return this;
   }
 
-  validate.use = function(name,fn){
-    if (arguments.length == 1) return delegate[name];
-    delegate[name] = fn; return this;
-  }
-
   validate.disableFormats = function(_){
     disableFormats = (undefined === _ || !!_)
     return this;
@@ -64,7 +62,34 @@ module.exports = function(version){
     return this;
   }
 
-  // sugar
+  validate.use = function(name,fn){
+    if (arguments.length == 1) return delegate[name];
+    delegate[name] = fn; return this;
+  }
+
+  validate.cache = function(_){
+    if (arguments.length == 0) return cache;
+    cache = _; return this;
+  }
+
+  validate.agent = function(_){
+    if (arguments.length == 0) return agent;
+    agent = _; return this;
+  }
+
+  validate.prefetch = function(urls,fn){
+    asyncEach(urls, _fetch, fn);
+
+    function _fetch(url, cb){
+      agent(url, function(err,data){
+        if (err) return cb(err);
+        cache.add(data,url);
+        cb();
+      });
+    }
+  }
+
+  // sugar -- may change in the future
   function validate(instance, fn){
     var ctx = validate.results(instance);
     var valid = ctx.valid();
@@ -77,7 +102,7 @@ module.exports = function(version){
 
   validate.results = function(instance){
     if (has.call(schema,'$schema')) this.version(schema['$schema']);
-    var v = bind(validator(Cache()));
+    var v = bind(validator(cache));
     var d = extend( {}, 
                     DELEGATES[version] || DELEGATES[ SCHEMAURLS[version] ] || {},
                     delegate
@@ -153,6 +178,8 @@ module.exports = function(version){
 }
 
 
+// utils
+
 function extend(obj) {
   if (!(type(obj) == 'object')) return obj;
   var source, prop;
@@ -164,4 +191,49 @@ function extend(obj) {
   }
   return obj;
 };
+
+
+function jsonXHR(url,cb){
+  var req = xhr(url, cb, function(req){
+    return JSON.parse(req.responseText);
+  });
+  req.send();
+}
+
+// simplified from d3.xhr
+
+function xhr(url, cb, fn){
+  var req = new XMLHttpRequest();
+  "onload" in req 
+    ? req.onload = req.onerror = _respond
+    : req.onreadystatechange = function(){ req.readState > 3 && _respond(); }
+
+  function _respond(){
+    var status = req.status, result;
+    if (!status && _hasResponse(req) || status >= 200 && status < 300 || status === 304){
+      try {
+        result = fn(req);
+      } catch (e){
+        cb(e,req);
+      }
+      cb(null,result);
+    } else {
+      var msg = (req.responseText || 'Error fetching ' + url) + ' (' + status + ')';
+      cb(new Error(msg), req);
+    }
+  }
+
+  function _hasResponse(req){
+    var type = req.responseType;
+    return !!(
+      type && type !== 'text'
+        ? req.response
+        : req.responseText
+    );
+  }
+
+  req.open('GET',url);
+  return req;
+}
+
 

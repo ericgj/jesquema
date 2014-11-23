@@ -5,7 +5,8 @@
   "version": "0.0.7",
   "keywords": [],
   "dependencies": {
-    "component/type": "*"  
+    "component/type": "*",  
+    "paulmillr/async-each": "*"
   },
   "development": {
     "timoxley/assert": "*"  

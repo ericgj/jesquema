@@ -1,6 +1,8 @@
 SUITESRC = JSON-Schema-Test-Suite/tests/draft4
 SUITEOPTSRC = JSON-Schema-Test-Suite/tests/draft4/optional
+SUITEREMSRC = JSON-Schema-Test-Suite/remotes
 SUITEDST = test/suite
+SUITEREMDST = test/remotes
 
 SUITEFILES = $(wildcard $(SUITESRC)/*.json)
 SUITEJSON = $(notdir $(SUITEFILES))
@@ -12,7 +14,7 @@ SUITEOPTJSON = $(notdir $(SUITEOPTFILES))
 SUITEOPTJS = $(addsuffix .js, $(basename $(SUITEOPTJSON)))
 SUITEOPTDSTFILES = $(SUITEOPTJS:%.js=$(SUITEDST)/%.js)
 
-build: components index.js $(SUITEDSTFILES) $(SUITEOPTDSTFILES)
+build: components index.js $(SUITEDSTFILES) $(SUITEOPTDSTFILES) $(SUITEREMDST)
 	@component build --dev
 
 components: component.json
@@ -30,7 +32,10 @@ $(SUITEDST)/%.js: $(SUITEOPTSRC)/%.json
 	@cat "$<"  >> $@
 	@echo ";" >> $@
 
+$(SUITEREMDST): $(SUITEREMSRC)
+	@cp -r "$<" "$@"
+
 clean:
-	rm -fr build components template.js $(SUITEDST)
+	rm -fr build components template.js $(SUITEREMDST) $(SUITEDST)
 
 .PHONY: clean

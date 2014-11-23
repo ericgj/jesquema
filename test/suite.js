@@ -17,7 +17,7 @@ describe('standard test suite', function(){
 
       for (var j=0;j<tests.length;++j){
         var test = tests[j]
-        genTests(test);
+        genTests(test,key);
       }
 
     })
@@ -27,7 +27,21 @@ describe('standard test suite', function(){
 })
 
 
-function genTests(obj){
+var REMOTES = {
+  'definitions': [ 'http://json-schema.org/draft-04/schema#' ],
+  'ref':         [ 'http://json-schema.org/draft-04/schema#' ],
+  'refRemote':   [ 'http://localhost:1234/integer.json', 
+                   'http://localhost:1234/subSchemas.json',
+                   'http://localhost:1234/folder/folderInteger.json'
+                 ]
+}
+
+var AGENTS = {
+  'definitions': githubAPI,
+  'ref':         githubAPI
+}
+
+function genTests(obj,type){
   
   describe(obj.description, function(){
 
@@ -39,13 +53,31 @@ function genTests(obj){
 
       // console.log(testcase.description + ' : expected: %s', exp);
 
-      it(testcase.description, function(){
-        var v = validate('4').schema(schema)
-          , ctx = v.results(instance)
-          , act = ctx.valid()
+      it(testcase.description, function(done){
+        var v = validate('4').schema(schema), ctx, act;
+        var remotes = REMOTES[type];
+        var agent   = AGENTS[type];
+        if (remotes && remotes.length > 0){
+          if (agent) v.agent(agent);
+          v.prefetch(remotes, function(err){
+            v.cache().debug();
+            if (err) return done(err);
+            ctx = v.results(instance);
+            act = ctx.valid();
+            if (exp != act) _debug();
+            assert(exp == act);
+            done();
+          });
+        } else {
+          var ctx = v.results(instance);
+          var act = ctx.valid();
+          if (exp !== act) _debug();
+          assert(exp == act);
+          done();
+        }
 
         ////// This is strictly for debugging. If all tests pass, none of this will output.
-        if (exp !== act){
+        function _debug(){
           console.error(testcase.description + ' : %o , expected: %s', [instance, schema], exp);
           var trace = ctx.assertions();
           for (var i=0;i<trace.length;++i){
@@ -59,11 +91,57 @@ function genTests(obj){
         }
         //////
 
-        assert(exp == act);
       })
     })
   })
 }
 
+
+// horrid workaround for Github pages lack of CORS....
+
+function githubAPI(url, cb){
+  var parts = new window.URL('',url);
+  url = new window.URL(parts.pathname.slice(1), 
+                   'https://api.github.com/repos/json-schema/json-schema/contents/0').toString();
+  var req = xhr(url, cb, function(req){
+    return JSON.parse(req.responseText);
+  });
+  req.setRequestHeader('Accept','application/vnd.github.3.raw');
+  req.send();
+}
+
+function xhr(url, cb, fn){
+  var req = new XMLHttpRequest();
+  "onload" in req 
+    ? req.onload = req.onerror = _respond
+    : req.onreadystatechange = function(){ req.readState > 3 && _respond(); }
+
+  function _respond(){
+    var status = req.status, result;
+    if (!status && _hasResponse(req) || status >= 200 && status < 300 || status === 304){
+      try {
+        result = fn(req);
+      } catch (e){
+        cb(e,req);
+      }
+      cb(null,result);
+    } else {
+      var msg = (req.responseText || 'Error fetching ' + url) + ' (' + status + ')';
+      cb(new Error(msg), req);
+    }
+  }
+
+  function _hasResponse(req){
+    var type = req.responseType;
+    return !!(
+      type && type !== 'text'
+        ? req.response
+        : req.responseText
+    );
+  }
+
+  req.open('GET',url);
+  return req;
+}
 
 

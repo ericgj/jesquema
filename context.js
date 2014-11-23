@@ -10,8 +10,8 @@ module.exports = Context;
 // TODO: refactor this using Pointer
 // basically the signature should be Context(instancePointer,schemaPointer)
 
-function Context(instance,schema,ipath,spath){
-  if (!(this instanceof Context)) return new Context(instance,schema,ipath,spath);
+function Context(instance,schema,ipath,spath,parent){
+  if (!(this instanceof Context)) return new Context(instance,schema,ipath,spath,parent);
   this.instance = instance;
   this.schema = schema;
   this.instancePath = (ipath === undefined ? [] : ipath);
@@ -19,6 +19,7 @@ function Context(instance,schema,ipath,spath){
   this._assertions = [];
   this._delegate = undefined;
   this.contexts = [];
+  this.parent = parent;
   this.validAll();
   return this;
 }
@@ -33,17 +34,12 @@ Context.prototype.delegate = function(_){
 }
 
 Context.prototype.scope = function(){
-  var schema = this.schema;
-  var path  = this.schemaPath;
-  var base = URL('',schema['id']);
-  return this.schemaPath.reduce( function(url,_,i){
-    var s = getPath(schema,path.slice(0,i+1));
-    if (has.call(s,'id')){
-      return URL(s['id'],url).toString();
-    } else {
-      return url;
-    }
-  }, base);
+  var schemaPath = this.schemaPath
+    , schema = getPath(this.schema, schemaPath)
+    , parent = this.parent;
+  if (parent === undefined) return URL('',schema['id']).toString();
+  if (!has.call(schema,'id'))    return parent.scope();
+  return URL(schema['id'], parent.scope()).toString();
 }
 
 Context.prototype.assertionsValid = function(){
@@ -116,19 +112,29 @@ Context.prototype.subcontext = function(ipath,spath){
   var ctx =  Context(this.instance, 
                      this.schema, 
                      ipathsub,
-                     spathsub
+                     spathsub,
+                     this
                     );
   if (!(this._delegate === undefined)) ctx.delegate(this._delegate);
   this.contexts.push(ctx);
   return ctx;
 }
 
-// apply external (ref) schema to current instance
+/* Graft referenced schema to current instance as subcontext
+ * Note that if the referenced schema has a separate root (i.e., is remote)
+ *   then the parent context is the _top-level_ context of the referenced schema. 
+ * This means that a "reference to a reference" in the remote schema may not be 
+ *   resolved correctly, if it includes nested scopes (ids). But hopefully this
+ *   is rare.
+ */
 Context.prototype.graftContext = function(schema,spath){
   var ctx =  Context(this.instance,
                      schema,
                      this.instancePath.slice(0),
-                     spath.slice(0)
+                     spath.slice(0),
+                     // schema === this.schema 
+                     //  ? this :
+                     Context(undefined, schema, [], [])
                     );
   if (!(this._delegate === undefined)) ctx.delegate(this._delegate);
   this.contexts.push(ctx);

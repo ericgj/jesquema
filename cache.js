@@ -29,10 +29,15 @@ function Cache(){
     throw new Cache.ReferenceError('Reference not found: "' + url + '"'); 
   }
 
-  cache.add = function(schema){
-    var id = schema['id'] || ''; 
-    schemas[ resolve(id,base) ] = schema;
+  cache.add = function(schema,id){
+    id = schema['id'] || id || ''; 
+    id = resolve('', resolve(id,base));
+    schemas[ id ] = extend({id: id},schema);
     return this;
+  }
+
+  cache.debug = function(){
+    console.debug( schemas );
   }
 
   function resolve(id,base){
@@ -59,14 +64,15 @@ Cache.ReferenceError.prototype = new ReferenceError();
 Cache.ReferenceError.prototype.constructor = Cache.ReferenceError;
 
 
-function getPath(instance,path){
-  if (!(typeof instance == 'object')) return instance;  // not object or array
-  if (0==path.length) return instance;
-  var prop = path[0]
-    , rest = path.slice(1)
-  if (0==prop.length) return getPath(instance,rest);
-  if (undefined === instance[prop]) return;
-  var branch = instance[prop];
-  return getPath(branch,rest);
-}
 
+function extend(obj) {
+  if (!(type(obj) == 'object')) return obj;
+  var source, prop;
+  for (var i = 1, length = arguments.length; i < length; i++) {
+    source = arguments[i];
+    for (prop in source) {
+      obj[prop] = source[prop];
+    }
+  }
+  return obj;
+};

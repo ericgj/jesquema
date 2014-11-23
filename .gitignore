@@ -1,4 +1,6 @@
 components
 build
 test/suite
+test/remotes
 scratch
+node_modules

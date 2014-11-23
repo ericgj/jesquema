@@ -11,7 +11,7 @@ function Pointer(object,path){
 Pointer.prototype.target = function(){
   var ret = getPath(this.object, this.path);
   if (ret === undefined) 
-    throw new Pointer.ReferenceError('Reference not found: "' + this.path.join('/') + '"');
+    throw new Pointer.ReferenceError('Reference not found: "' + this.path.join('/') + '" ' + 'within ' + JSON.stringify(this.object));
   return ret;
 }
 
