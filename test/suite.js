@@ -60,7 +60,6 @@ function genTests(obj,type){
         if (remotes && remotes.length > 0){
           if (agent) v.agent(agent);
           v.prefetch(remotes, function(err){
-            v.cache().debug();
             if (err) return done(err);
             ctx = v.results(instance);
             act = ctx.valid();

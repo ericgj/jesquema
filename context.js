@@ -132,8 +132,6 @@ Context.prototype.graftContext = function(schema,spath){
                      schema,
                      this.instancePath.slice(0),
                      spath.slice(0),
-                     // schema === this.schema 
-                     //  ? this :
                      Context(undefined, schema, [], [])
                     );
   if (!(this._delegate === undefined)) ctx.delegate(this._delegate);

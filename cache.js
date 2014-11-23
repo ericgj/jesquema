@@ -32,7 +32,7 @@ function Cache(){
   cache.add = function(schema,id){
     id = schema['id'] || id || ''; 
     id = resolve('', resolve(id,base));
-    schemas[ id ] = extend({id: id},schema);
+    schemas[ id ] = extend({},schema,{id: id});
     return this;
   }
 
