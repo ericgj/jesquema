@@ -1,6 +1,6 @@
 {
   "name": "jesquema",
-  "version": "0.0.7",
+  "version": "0.1.1",
   "description": "JSON Schema validator",
   "main": "index.js",
   "directories": {
