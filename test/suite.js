@@ -59,11 +59,11 @@ function genTests(obj,type){
         var agent   = AGENTS[type];
         if (remotes && remotes.length > 0){
           if (agent) v.agent(agent);
-          v.prefetch(remotes, function(err){
+          v.prefetch.apply(v,remotes);
+          v.async(instance, function(err,ctx){
             if (err) return done(err);
-            ctx = v.results(instance);
-            act = ctx.valid();
-            if (exp != act) _debug();
+            var act = ctx.valid();
+            if (exp !== act) _debug();
             assert(exp == act);
             done();
           });

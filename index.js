@@ -30,6 +30,7 @@ module.exports = function(version){
     , throwerr = false
     , delegate = {}
     , cache = Cache()
+    , prefetches = []
     , agent = jsonXHR
 
   validate.schema = function(_){
@@ -77,8 +78,23 @@ module.exports = function(version){
     agent = _; return this;
   }
 
-  validate.prefetch = function(urls,fn){
-    asyncEach(urls, _fetch, fn);
+  validate.prefetch = function(){
+    prefetches.push.apply(prefetches, [].slice.call(arguments,0));
+    return this;
+  }
+
+  validate.valid = function(instance){
+    return validate(instance).valid();
+  }
+
+  validate.results = validate;  // backwards compatibility
+  
+  validate.async = function(instance, fn){
+    if (prefetches.length == 0) return fn(undefined, validate(instance));
+    return asyncEach(prefetches, _fetch, function(err){
+      if (err) return fn(err);
+      return fn(undefined, validate(instance));
+    });
 
     function _fetch(url, cb){
       agent(url, function(err,data){
@@ -89,18 +105,7 @@ module.exports = function(version){
     }
   }
 
-  // sugar -- may change in the future
-  function validate(instance, fn){
-    var ctx = validate.results(instance);
-    var valid = ctx.valid();
-    var err;
-    if (!valid) err = ctx.error();
-    if (throwerr && err) throw err;
-    if (fn) fn(err, ctx);
-    return ctx.valid();
-  }
-
-  validate.results = function(instance){
+  function validate(instance){
     if (has.call(schema,'$schema')) this.version(schema['$schema']);
     var v = bind(validator(cache));
     var d = extend( {}, 
@@ -109,6 +114,8 @@ module.exports = function(version){
                   );
     var ctx = Context(instance,schema).delegate(d);
     v.validate(instance, schema, ctx, true);
+    var valid = ctx.valid();
+    if (throwerr && !valid) throw ctx.error();
     return ctx;
   }
 

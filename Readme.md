@@ -27,17 +27,17 @@
   var validator = require('jesquema');
   var v = validator('4').schema( schema );
   
-  // simple usage
-  var valid = v( instance );
+  // simple usage, returns true or false
+  var valid = v.valid( instance );
 
   // or to get assertion context
-  var context = v.results( instance );
+  var context = v( instance );
   if (!context.valid()) console.error( context.error() );
   console.debug( context.trace() );
 
   // to throw error if invalid
   v.throw(true);
-  v( instance );
+  v.valid( instance );
   
   // to add custom format via regex or function
   v.format( 'account', /^\d{3}\-\d{4}$/ );
@@ -52,7 +52,7 @@
   });
 
   // to extract links (link templates) from all valid subschemas
-  var links = v.results(instance).links();
+  var links = v(instance).links();
 
   ```
 
