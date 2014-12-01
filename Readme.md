@@ -45,10 +45,13 @@
     return instance.y <= (2 * instance.x); 
   });
   
-  // to resolve remote schema refs
-  v.prefetch( ['http://my.schemas.com/one', 
-               'http://my.schemas.com/two'], function(err){
-    v( instance );
+  // to resolve remote schema refs, prefetch first and then call async
+  v.prefetch( 'http://my.schemas.com/one', 
+              'http://my.schemas.com/two'
+            );
+  v.async(instance, function(err,ctx){
+    if (err) throw err;
+    var valid = ctx.valid();
   });
 
   // to extract links (link templates) from all valid subschemas
