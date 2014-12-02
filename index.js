@@ -23,8 +23,7 @@ DELEGATES[ 'http://json-schema.org/schema#'] = DELEGATES[  SCHEMAURLS['4'] ];
 
 module.exports = function(version){
 
-  var schema = {}
-    , abort = false
+  var abort = false
     , formats = {}
     , disableFormats = false
     , throwerr = false
@@ -32,11 +31,6 @@ module.exports = function(version){
     , cache = Cache()
     , prefetches = []
     , agent = jsonXHR
-
-  validate.schema = function(_){
-    if (arguments.length == 0) return schema;
-    schema = _; return this;
-  }
 
   validate.version = function(_){
     if (arguments.length == 0) return version;
@@ -83,17 +77,17 @@ module.exports = function(version){
     return this;
   }
 
-  validate.valid = function(instance){
-    return validate(instance).valid();
+  validate.valid = function(schema, instance){
+    return validate(schema, instance).valid();
   }
 
   validate.results = validate;  // backwards compatibility
   
-  validate.async = function(instance, fn){
-    if (prefetches.length == 0) return fn(undefined, validate(instance));
+  validate.async = function(schema, instance, fn){
+    if (prefetches.length == 0) return fn(undefined, validate(schema, instance));
     return asyncEach(prefetches, _fetch, function(err){
       if (err) return fn(err);
-      return fn(undefined, validate(instance));
+      return fn(undefined, validate(schema, instance));
     });
 
     function _fetch(url, cb){
@@ -105,8 +99,9 @@ module.exports = function(version){
     }
   }
 
-  function validate(instance){
-    if (has.call(schema,'$schema')) this.version(schema['$schema']);
+  function validate(schema, instance){
+    if (has.call(schema,'$schema')) validate.version(schema['$schema']);
+    
     var v = bind(validator(cache));
     var d = extend( {}, 
                     DELEGATES[version] || DELEGATES[ SCHEMAURLS[version] ] || {},
@@ -164,14 +159,13 @@ module.exports = function(version){
   }
 
   function bind(target){
-    extend( target, 
-            BINDINGS[version] || BINDINGS[ SCHEMAURLS[version] ] || {}
-          );
-    
-    extend( target.formats,
-            FORMATS[version] || FORMATS[ SCHEMAURLS[version] ] || {} ,
-            formats
-          );
+    var bindings = BINDINGS[version] || BINDINGS[ SCHEMAURLS[version] ]
+      , formats  = FORMATS[version]  || FORMATS[ SCHEMAURLS[version] ]  ;
+    if (!bindings) throw new Error('Unknown JSON Schema version: ' + version);
+
+    extend( target, bindings );
+    extend( target.formats, formats );
+
     return target;
   }
 

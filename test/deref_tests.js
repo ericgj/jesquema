@@ -7,15 +7,15 @@ describe('context.scope', function(){
   
   it('should return top-level id if given', function(){
     var schema = {'id': 'http://foo.com/some/path' }
-    var v = validate('4').schema(schema);
-    var actual = v.results({});
+    var v = validate('4');
+    var actual = v(schema,{});
     assert.equal(actual.scope(), schema.id);
   });
 
   it('should return top-level id from sub-schema', function(){
     var schema = {'id': 'http://foo.com/some/path', 'properties': { 'foo': {} } }
-    var v = validate('4').schema(schema);
-    var actual = v.results({'foo': 'bar'});
+    var v = validate('4');
+    var actual = v(schema,{'foo': 'bar'});
     assert.equal(actual.contexts.length, 1);
     actual.contexts.forEach( function(c){
       assert.equal(c.scope(), schema.id);
@@ -24,8 +24,8 @@ describe('context.scope', function(){
 
   it('should return sub-schema fragment id resolved against top-level id, if given', function(){
     var schema = {'id': 'http://foo.com/some/path', 'properties': { 'foo': { 'id': '#foo'} } }
-    var v = validate('4').schema(schema);
-    var actual = v.results({'foo': 'bar'});
+    var v = validate('4');
+    var actual = v(schema,{'foo': 'bar'});
     assert.equal(actual.contexts.length, 1);
     var propcontext = actual.contexts[0];
     console.log(this.test.fullTitle() + ': %o', propcontext.scope());
@@ -34,8 +34,8 @@ describe('context.scope', function(){
  
   it('should return sub-schema path id resolved against top-level id, if given', function(){
     var schema = {'id': 'http://foo.com/some/path', 'properties': { 'foo': { 'id': 'foo'} } }
-    var v = validate('4').schema(schema);
-    var actual = v.results({'foo': 'bar'});
+    var v = validate('4');
+    var actual = v(schema,{'foo': 'bar'});
     assert.equal(actual.contexts.length, 1);
     var propcontext = actual.contexts[0];
     console.log(this.test.fullTitle() + ': %o', propcontext.scope());
@@ -55,8 +55,8 @@ describe('context.scope', function(){
                     } 
                   }
                  };
-    var v = validate('4').schema(schema);
-    var actual = v.results({'foo': { 'bar': 0 } });
+    var v = validate('4');
+    var actual = v(schema,{'foo': { 'bar': 0 } });
     assert.equal(actual.contexts.length, 1);
     assert.equal(actual.contexts[0].contexts.length, 1);
     var propcontext = actual.contexts[0].contexts[0];
@@ -77,8 +77,8 @@ describe('context.scope', function(){
                     } 
                   }
                  };
-    var v = validate('4').schema(schema);
-    var actual = v.results({'foo': { 'bar': 0 } });
+    var v = validate('4');
+    var actual = v(schema,{'foo': { 'bar': 0 } });
     assert.equal(actual.contexts.length, 1);
     assert.equal(actual.contexts[0].contexts.length, 1);
     var propcontext = actual.contexts[0].contexts[0];
@@ -102,8 +102,8 @@ describe('pointer dereferencing', function(){
                    }
                  }
 
-    var v = validate('4').schema(schema);
-    var actual = v.results({'foo': null});
+    var v = validate('4');
+    var actual = v(schema,{'foo': null});
     console.log(this.test.fullTitle() + ': trace: %o', actual.trace());
     assert( actual.valid() );
     assert.equal( actual.trace().length, 1);
@@ -125,8 +125,8 @@ describe('pointer dereferencing', function(){
                    }
                  }
 
-    var v = validate('4').schema(schema);
-    var actual = v.results({'foo': [null,'2',null,3] });
+    var v = validate('4');
+    var actual = v(schema,{'foo': [null,'2',null,3] });
     console.log(this.test.fullTitle() + ': trace: %o', actual.trace());
     assert( !actual.valid() );
     assert.equal( actual.trace().length, 9);
@@ -154,8 +154,8 @@ describe('pointer dereferencing', function(){
                    }
                  }
 
-    var v = validate('4').schema(schema);
-    var actual = v.results({'foo': 0 });
+    var v = validate('4');
+    var actual = v(schema,{'foo': 0 });
     console.log(this.test.fullTitle() + ': trace: %o', actual.trace());
     assert( actual.valid() );
     assert.equal( actual.trace().length, 5);
@@ -167,9 +167,9 @@ describe('pointer dereferencing', function(){
                      'foo': { '$ref': '#/doesnt/exist' }
                    }
                  }
-    var v = validate('4').schema(schema);
+    var v = validate('4');
     try {
-      var actual = v.results({'foo': 'imaginary'});
+      var actual = v(schema,{'foo': 'imaginary'});
     } catch (e){
       console.log(this.test.fullTitle() + ': error: %o', e);
       assert.equal(e.name, 'ReferenceError');

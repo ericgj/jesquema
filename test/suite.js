@@ -54,13 +54,13 @@ function genTests(obj,type){
       // console.log(testcase.description + ' : expected: %s', exp);
 
       it(testcase.description, function(done){
-        var v = validate('4').schema(schema), ctx, act;
+        var v = validate('4'), ctx, act;
         var remotes = REMOTES[type];
         var agent   = AGENTS[type];
         if (remotes && remotes.length > 0){
           if (agent) v.agent(agent);
           v.prefetch.apply(v,remotes);
-          v.async(instance, function(err,ctx){
+          v.async(schema, instance, function(err,ctx){
             if (err) return done(err);
             var act = ctx.valid();
             if (exp !== act) _debug();
@@ -68,7 +68,7 @@ function genTests(obj,type){
             done();
           });
         } else {
-          var ctx = v.results(instance);
+          var ctx = v(schema, instance);
           var act = ctx.valid();
           if (exp !== act) _debug();
           assert(exp == act);
